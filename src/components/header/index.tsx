@@ -5,16 +5,16 @@ import style from './style.css';
 const Header: FunctionalComponent = () => {
     return (
         <header class={style.header}>
-            <h1>Preact App</h1>
+            <h1>This is NES!</h1>
             <nav>
                 <Link activeClassName={style.active} href="/">
                     Home
                 </Link>
                 <Link activeClassName={style.active} href="/profile">
-                    Me
+                    NOSE
                 </Link>
                 <Link activeClassName={style.active} href="/profile/john">
-                    John
+                    NAS
                 </Link>
             </nav>
         </header>
