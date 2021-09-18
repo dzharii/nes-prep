@@ -37,8 +37,9 @@ jobs:
     - run: npm ci
     - run: npm run build
     - run: git fetch
-    - run: git checkout gh-pages
+    - run: git checkout -f gh-pages
     - run: cp -rf build/* ./
+    - run: rm -rf build
     - run: git add --all
     - run: git commit -am "web-update" || echo 'nothing to commit'
     - run: git push || echo 'nothing to push'
