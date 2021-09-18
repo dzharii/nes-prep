@@ -40,8 +40,8 @@ jobs:
     - run: git checkout gh-pages
     - run: cp -rf build/* ./
     - run: git add --all
-    - run: git commit -am "web-update"
-    - run: git push
+    - run: git commit -am "web-update" || echo 'nothing to commit'
+    - run: git push || echo 'nothing to push'
     - run: git checkout main
 
 
