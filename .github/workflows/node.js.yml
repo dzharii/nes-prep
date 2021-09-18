@@ -36,6 +36,7 @@ jobs:
     - run: chmod 600 ~/.ssh/known_hosts
     - run: npm ci
     - run: npm run build
+    - run: git fetch
     - run: git checkout gh-pages
     - run: cp -rf build/* ./
     - run: git add --all
