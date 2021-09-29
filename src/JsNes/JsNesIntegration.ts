@@ -1,5 +1,6 @@
 type JsNes = any;
 declare const jsnes: JsNes
+type INesKeyCallback = (controller: any, button: any) => void
 
 const SCREEN_WIDTH = 256;
 const SCREEN_HEIGHT = 240;
@@ -32,7 +33,6 @@ var nes = new jsnes.NES({
 
 function onAnimationFrame(){
 	window.requestAnimationFrame(onAnimationFrame);
-
 	image.data.set(framebuffer_u8);
 	canvas_ctx.putImageData(image, 0, 0);
 }
@@ -41,7 +41,7 @@ function audio_remain(){
 	return (audio_write_cursor - audio_read_cursor) & SAMPLE_MASK;
 }
 
-function audio_callback(event){
+function audio_callback(event: AudioProcessingEvent){
 	var dst = event.outputBuffer;
 	var len = dst.length;
 
@@ -59,8 +59,8 @@ function audio_callback(event){
 	audio_read_cursor = (audio_read_cursor + len) & SAMPLE_MASK;
 }
 
-function keyboard(callback, event: KeyboardEvent){
-	var player = 1;
+function keyboard(callback: INesKeyCallback, event: KeyboardEvent){
+    var player = 1;
 	switch(event.keyCode){
 		case 38: // UP
 			callback(player, jsnes.Controller.BUTTON_UP); break;
@@ -84,11 +84,13 @@ function keyboard(callback, event: KeyboardEvent){
 	}
 }
 
-function nes_init(canvas_id: string){
+export function nes_init(canvas_id: string){
 	const canvas = document.getElementById(canvas_id) as HTMLCanvasElement;
     if (!canvas) throw new Error('Main canvas element was not found');
 
-	canvas_ctx = canvas.getContext("2d");
+	canvas_ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+    if (!canvas_ctx) throw new Error('Unable to obtain 2d context from main canvas');
+
 	image = canvas_ctx.getImageData(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	canvas_ctx.fillStyle = "black";
@@ -99,25 +101,24 @@ function nes_init(canvas_id: string){
 	framebuffer_u8 = new Uint8ClampedArray(buffer);
 	framebuffer_u32 = new Uint32Array(buffer);
 
-	// Setup audio.
+    // Setup audio.
 	var audio_ctx = new window.AudioContext();
 	var script_processor = audio_ctx.createScriptProcessor(AUDIO_BUFFERING, 0, 2);
 	script_processor.onaudioprocess = audio_callback;
 	script_processor.connect(audio_ctx.destination);
 }
 
-function nes_boot(rom_data){
+export function nes_boot(rom_data: string){
 	nes.loadROM(rom_data);
 	window.requestAnimationFrame(onAnimationFrame);
 }
 
-function nes_load_data(canvas_id, rom_data){
-	alert(1);
+function nes_load_data(canvas_id: string, rom_data: string){
 	nes_init(canvas_id);
 	nes_boot(rom_data);
 }
 
-function nes_load_url(canvas_id, path){
+export function nes_load_url(canvas_id: string, path: string){
 	nes_init(canvas_id);
 
 	var req = new XMLHttpRequest();
@@ -131,7 +132,7 @@ function nes_load_url(canvas_id, path){
 		} else if (this.status === 0) {
 			// Aborted, so ignore error
 		} else {
-			req.onerror();
+			(req as any).onerror();
 		}
 	};
 
